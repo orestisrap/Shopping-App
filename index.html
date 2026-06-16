@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart AI Shopping Filter</title>
+    <title>Smart AI Shopping Filter v4</title>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background-color: #0f172a; color: #f8fafc; padding: 20px; max-width: 480px; margin: 0 auto; }
         h2 { text-align: center; color: #38bdf8; margin-bottom: 5px; }
@@ -26,26 +26,23 @@
 <body>
 
     <h2>🤖 AI Shopping Filter</h2>
-    <div class="sub">Έκδοση Online με Αυτόματη Ανάλυση</div>
+    <div class="sub">Έκδοση με Φίλτρο Αυστηρότητας για Γλυκά/Junk</div>
     
     <div class="card">
-        <!-- Εισαγωγή Προϊόντος / Φωτογραφίας -->
         <label for="productName">🛒 Όνομα Προϊόντος ή Σκανάρισμα:</label>
-        <input type="text" id="productName" placeholder="π.χ. Μπάρα πρωτεΐνης γεύση σοκολάτα">
+        <input type="text" id="productName" placeholder="π.χ. Σοκολάτα 300γρ">
         <input type="file" id="productImage" accept="image/*">
 
-        <!-- Φίλτρο Κόστους με τιμή -->
         <label for="price">💰 Τιμή Προϊόντος (€):</label>
         <input type="number" id="price" step="0.01" placeholder="π.χ. 2.50">
 
-        <!-- Φίλτρο Επιθυμίας -->
         <label for="desire">❤️ Πόσο το θέλεις τώρα; (1-10):</label>
         <select id="desire">
-            <option value="10">10 - Απόλυτη Επιβίωση (Νερό, φάρμακα)</option>
-            <option value="9">9 - Κρίσιμη Ανάγκη (Εργαλείο δουλειάς)</option>
-            <option value="8">8 - Βασική Ανάγκη (Ρούχα, απαραίτητα)</option>
-            <option value="7">7 - Αναβάθμιση Ζωής (Πιο γρήγορο κινητό)</option>
-            <option value="6">6 - Σταθερή Επιθυμία (Το θες μήνες, χόμπι)</option>
+            <option value="10">10 - Απόλυτη Επιβίωση / Τεράστια Επιθυμία</option>
+            <option value="9">9 - Πολύ μεγάλη Επιθυμία / Κρίσιμη Ανάγκη</option>
+            <option value="8">8 - Βασική Ανάγκη / Έντονη Επιθυμία</option>
+            <option value="7">7 - Αναβάθμιση Ζωής / Αρκετή Επιθυμία</option>
+            <option value="6">6 - Σταθερή Επιθυμία (Το θες μέρες)</option>
             <option value="5">5 - Μέτρια Επιθυμία (Σου αρέσει απλά)</option>
             <option value="4">4 - Παρορμητική τάση (Το είδες τώρα)</option>
             <option value="3">3 - Περαστικό καπρίτσιο (Shopping therapy)</option>
@@ -53,7 +50,6 @@
             <option value="1">1 - Άνετα ζεις χωρίς αυτό (Περιττό)</option>
         </select>
 
-        <!-- Social Bonus -->
         <div class="checkbox-container">
             <input type="checkbox" id="socialBonus">
             <label for="socialBonus" style="margin: 0; font-weight: normal; font-size: 15px; color: #bfdbfe;">👥 Είμαι με παρέα / φίλους (+1 Bonus)</label>
@@ -93,17 +89,20 @@
             document.getElementById('loadingText').style.display = "block";
             document.getElementById('resultBox').style.display = "none";
 
-            // ΠΡΟΣΩΜΟΙΩΣΗ ONLINE AI ΑΝΑΛΥΣΗΣ ΥΓΕΙΑΣ
-            // Εδώ το AI αναγνωρίζει λέξεις-κλειδιά (ζάχαρη, γύρος, κοτόπουλο) για να βγάλει αυτόματα το σκορ υγείας
             setTimeout(() => {
-                let healthScore = 6; // Προεπιλογή: Ουδέτερο
+                let healthScore = 6; 
                 const lowerProd = product.toLowerCase();
 
-                if (lowerProd.includes("γύρος") || lowerProd.includes("σουβλάκι") || lowerProd.includes("donut") || lowerProd.includes("burger")) healthScore = 2;
-                else if (lowerProd.includes("μπάρα") || lowerProd.includes("energy")) healthScore = 5;
-                else if (lowerProd.includes("σαλάτα") || lowerProd.includes("κοτόπουλο") || lowerProd.includes("μπρόκολο")) healthScore = 10;
-                else if (lowerProd.includes("ρύζι") || lowerProd.includes("μακαρόνια")) healthScore = 6;
-                else if (lowerProd.includes("αναψυκτικό") || lowerProd.includes("red bull") || lowerProd.includes("ποτό")) healthScore = 1;
+                // Ανίχνευση ανθυγιεινών τροφίμων
+                if (lowerProd.includes("σοκολάτα") || lowerProd.includes("σοκολατα") || lowerProd.includes("γλυκό") || lowerProd.includes("γλυκο") || lowerProd.includes("donut") || lowerProd.includes("πατατάκια")) {
+                    healthScore = 3; // Πολύ χαμηλό σκορ υγείας
+                } else if (lowerProd.includes("γύρος") || lowerProd.includes("σουβλάκι") || lowerProd.includes("burger")) {
+                    healthScore = 2;
+                } else if (lowerProd.includes("μπάρα") || lowerProd.includes("energy")) {
+                    healthScore = 5;
+                } else if (lowerProd.includes("σαλάτα") || lowerProd.includes("κοτόπουλο") || lowerProd.includes("μπρόκολο")) {
+                    healthScore = 10;
+                }
 
                 const costScore = calculateCostScore(price);
                 let finalScore = (costScore + healthScore + desire) / 3;
@@ -113,24 +112,32 @@
                     if (finalScore > 10) finalScore = 10;
                 }
 
-                finalScore = finalScore.toFixed(1);
+                finalScore = parseFloat(finalScore.toFixed(1));
                 
+                // 🔥 Ο ΝΕΟΣ ΚΑΝΟΝΑΣ ΑΥΣΤΗΡΟΤΗΤΑΣ
+                // Αν είναι ανθυγιεινό (Υγεία < 5) και η επιθυμία είναι 8 ή λιγότερο, το ρίχνει στο Κόκκινο!
+                let forceReject = false;
+                if (healthScore < 5 && desire <= 8) {
+                    forceReject = true;
+                }
+
                 document.getElementById('loadingText').style.display = "none";
                 const resBox = document.getElementById('resultBox');
                 resBox.style.display = "block";
 
-                if (finalScore >= 7.5) {
+                if (finalScore >= 7.5 && !forceReject) {
                     resBox.className = "green";
-                    resBox.innerHTML = `Σκορ: ${finalScore}<br>🟢 ΠΡΑΣΙΝΟ ΦΩΣ!<br><span style="font-size:13px; font-weight:normal;">AI Εκτίμηση Υγείας: ${healthScore}/10. Εγκρίνεται!</span>`;
-                } else if (finalScore >= 6.0 && finalScore <= 7.4) {
+                    resBox.innerHTML = `Σκορ: ${finalScore}<br>🟢 ΠΡΑΣΙΝΟ ΦΩΣ!<br><span style="font-size:13px; font-weight:normal;">AI Εκτίμηση Υγείας: ${healthScore}/10. Απόλαυσέ το!</span>`;
+                } else if (finalScore >= 6.0 && !forceReject) {
                     resBox.className = "yellow";
                     resBox.innerHTML = `Σκορ: ${finalScore}<br>🟡 ΚΙΤΡΙΝΟ ΦΩΣ!<br><span style="font-size:13px; font-weight:normal;">AI Εκτίμηση Υγείας: ${healthScore}/10. Οριακή έγκριση.</span>`;
                 } else {
                     resBox.className = "red";
-                    resBox.innerHTML = `Σκορ: ${finalScore}<br>🔴 ΚΟΚΚΙΝΟ ΦΩΣ!<br><span style="font-size:13px; font-weight:normal;">AI Εκτίμηση Υγείας: ${healthScore}/10. Μην το πάρεις!</span>`;
+                    resBox.innerHTML = `Σκορ: ${finalScore}<br>🔴 ΚΟΚΚΙΝΟ ΦΩΣ!<br><span style="font-size:13px; font-weight:normal;">Απορρίπτεται! Είναι ανθυγιεινό και η επιθυμία σου (${desire}/10) δεν είναι αρκετά υψηλή για να το δικαιολογήσει.</span>`;
                 }
-            }, 1200); // 1.2 δευτερόλεπτα καθυστέρηση για να "σκεφτεί" το AI
+            }, 1000);
         }
     </script>
 </body>
 </html>
+

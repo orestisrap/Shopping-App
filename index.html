@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart AI Shopping Filter v7</title>
+    <title>Smart AI Shopping Filter v8</title>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background-color: #0f172a; color: #f8fafc; padding: 20px; max-width: 480px; margin: 0 auto; }
         h2 { text-align: center; color: #38bdf8; margin-bottom: 5px; }
@@ -26,10 +26,10 @@
 <body>
 
     <h2>🛒 Live Calorie-Protein Filter</h2>
-    <div class="sub">Έκδοση v7 (Διορθωμένη Σύνδεση API)</div>
+    <div class="sub">Έκδοση v8 (Απευθείας Σύνδεση με Δικλείδα Ασφαλείας)</div>
     
     <div class="card">
-        <label for="productName">🔍 Αναζήτηση Προϊόντος (Αγγλικά ή Ελληνικά):</label>
+        <label for="productName">🔍 Όνομα Προϊόντος (Αγγλικά ή Ελληνικά):</label>
         <input type="text" id="productName" placeholder="e.g. Tuna, Lacta, Yogurt 2%">
 
         <label for="price">💰 Τιμή Προϊόντος (€):</label>
@@ -54,10 +54,10 @@
             <label for="socialBonus" style="margin: 0; font-weight: normal; font-size: 15px; color: #bfdbfe;">👥 Είμαι με παρέα / φίλους (+1 Bonus)</label>
         </div>
 
-        <button onclick="searchAndCalculate()">ΑΝΑΖΗΤΗΣΗ ΣΤΟ INTERNET & ΣΚΟΡ</button>
+        <button onclick="searchAndCalculate()">ΑΝΑΖΗΤΗΣΗ & ΥΠΟΛΟΓΙΣΜΟΣ</button>
     </div>
 
-    <div id="loadingText" class="loading">🌐 Γίνεται ασφαλής λήψη δεδομένων τροφίμων...</div>
+    <div id="loadingText" class="loading">🌐 Λήψη στοιχείων από Open Food Facts...</div>
     <div id="resultBox"></div>
 
     <script>
@@ -84,27 +84,24 @@
             document.getElementById('loadingText').style.display = "block";
             document.getElementById('resultBox').style.display = "none";
 
+            const fallbackUrl = `https://openfoodfacts.org{encodeURIComponent(product)}&search_simple=1&action=process&json=true&page_size=1`;
+
             try {
-                // Χρήση CORS Proxy για να μην μπλοκάρει ο browser τη σύνδεση
-                const targetUrl = `https://openfoodfacts.org{encodeURIComponent(product)}&search_simple=1&action=process&json=1&page_size=1`;
-                const proxyUrl = `https://allorigins.win{encodeURIComponent(targetUrl)}`;
-                
-                const response = await fetch(proxyUrl);
-                const proxyData = await response.json();
-                const data = JSON.parse(proxyData.contents);
+                const response = await fetch(fallbackUrl);
+                const data = await response.json();
 
                 let healthScore = 5; 
                 let calories = 0, carbs = 0, protein = 0, calToProteinRatio = 0;
                 let foundName = product;
 
-                if (data.products && data.products.length > 0) {
+                if (data && data.products && data.products.length > 0) {
                     const p = data.products[0];
                     foundName = p.product_name_el || p.product_name || product;
                     const nutrients = p.nutriments;
 
-                    calories = nutrients['energy-kcal_100g'] || 0;
-                    carbs = nutrients['carbohydrates_100g'] || 0;
-                    protein = nutrients['proteins_100g'] || 0;
+                    calories = nutrients['energy-kcal_100g'] || nutrients['energy-kcal'] || 0;
+                    carbs = nutrients['carbohydrates_100g'] || nutrients['carbohydrates'] || 0;
+                    protein = nutrients['proteins_100g'] || nutrients['proteins'] || 0;
 
                     if (protein > 0) {
                         calToProteinRatio = calories / protein;
@@ -118,12 +115,15 @@
                         healthScore = calories > 150 ? 2 : 5; 
                     }
 
-                    if (product.toLowerCase().includes("σοκολάτα") || product.toLowerCase().includes("lacta") || product.toLowerCase().includes("cola") || product.toLowerCase().includes("chocolate")) {
+                    const lowerProd = product.toLowerCase();
+                    if (lowerProd.includes("σοκολάτα") || lowerProd.includes("lacta") || lowerProd.includes("cola") || lowerProd.includes("chocolate") || lowerProd.includes("γλυκ")) {
                         healthScore = 2;
                     }
                 } else {
-                    // Αν δεν βρει καθόλου το προϊόν στη βάση, βάζει ένα ουδέτερο σκορ
-                    healthScore = 5;
+                    const lowerProd = product.toLowerCase();
+                    if (lowerProd.includes("σοκολάτα") || lowerProd.includes("lacta") || lowerProd.includes("chocolate")) healthScore = 2;
+                    else if (lowerProd.includes("γιαούρτι") || lowerProd.includes("yogurt") || lowerProd.includes("tuna") || lowerProd.includes("τόνος")) healthScore = 10;
+                    else healthScore = 5;
                 }
 
                 const costScore = calculateCostScore(price);
@@ -140,7 +140,7 @@
                 const resBox = document.getElementById('resultBox');
                 resBox.style.display = "block";
 
-                let ratioText = protein > 0 ? `${calToProteinRatio.toFixed(1)} kcal ανά 1g πρωτεΐνης` : 'N/A (Μηδενική πρωτεΐνη)';
+                let ratioText = protein > 0 ? `${calToProteinRatio.toFixed(1)} kcal ανά 1g πρωτεΐνης` : 'N/A';
 
                 let macroHTML = `
                     <div class="macro-info">
@@ -149,16 +149,15 @@
                         <strong>Υδατάνθρακες (100g):</strong> ${carbs}g<br>
                         <strong>Πρωτεΐνη (100g):</strong> ${protein}g<br>
                         <strong>Αναλογία:</strong> ${ratioText}<br>
-                        <strong>Στόχος Αναλογίας:</strong> &le; 10.0 (Ιδανικό)<br>
                         <strong>Βαθμός Υγείας:</strong> ${healthScore}/10
                     </div>`;
 
                 if (healthScore <= 3 && desire < 9) {
                     resBox.className = "red";
-                    resBox.innerHTML = `Σκορ: ${finalScore}<br>🔴 ΚΟΚΚΙΝΟ ΦΩΣ!<br><span style="font-size:14px; font-weight:normal;">Απορρίπτεται! Ο λόγος θερμίδων/πρωτεΐνης είναι κακός. Χρειάζεται επιθυμία 9 ή 10.</span> ${macroHTML}`;
+                    resBox.innerHTML = `Σκορ: ${finalScore}<br>🔴 ΚΟΚΚΙΝΟ ΦΩΣ!<br><span style="font-size:14px; font-weight:normal;">Απορρίπτεται λόγω macros! Χρειάζεται επιθυμία 9 ή 10.</span> ${macroHTML}`;
                 } else if (finalScore >= 6.0) {
                     resBox.className = finalScore >= 7.5 ? "green" : "yellow";
-                    resBox.innerHTML = `Σκορ: ${finalScore}<br>${finalScore >= 7.5 ? '🟢 ΠΡΑΣΙΝΟ ΦΩΣ!' : '🟡 ΚΙΤΡΙΝΟ ΦΩΣ!'}<br><span style="font-size:14px; font-weight:normal;">Η αγορά εγκρίνεται βάσει των κριτηρίων σου.</span> ${macroHTML}`;
+                    resBox.innerHTML = `Σκορ: ${finalScore}<br>${finalScore >= 7.5 ? '🟢 ΠΡΑΣΙΝΟ ΦΩΣ!' : '🟡 ΚΙΤΡΙΝΟ ΦΩΣ!'}<br><span style="font-size:14px; font-weight:normal;">Η αγορά εγκρίνεται!</span> ${macroHTML}`;
                 } else {
                     resBox.className = "red";
                     resBox.innerHTML = `Σκορ: ${finalScore}<br>🔴 ΚΟΚΚΙΝΟ ΦΩΣ!<br><span style="font-size:14px; font-weight:normal;">Απορρίπτεται.</span> ${macroHTML}`;
@@ -166,9 +165,16 @@
 
             } catch (error) {
                 document.getElementById('loadingText').style.display = "none";
-                alert("Πρόβλημα κατά τη λήψη δεδομένων. Δοκίμασε ξανά σε λίγο!");
-            }
-        }
-    </script>
-</body>
-</html>
+                const costScore = calculateCostScore(price);
+                let healthScore = 5;
+                const lowerProd = product.toLowerCase();
+                if (lowerProd.includes("σοκολάτα") || lowerProd.includes("lacta")) healthScore = 2;
+                else if (lowerProd.includes("γιαούρτι") || lowerProd.includes("tuna")) healthScore = 10;
+                
+                let finalScore = (costScore + healthScore + desire) / 3;
+if (isSocial) finalScore += 1.0;
+                finalScore = parseFloat(finalScore.toFixed(1));
+                const resBox = document.getElementById('resultBox');resBox.style.display = "block";
+                if (healthScore <= 3 && desire < 9) {resBox.className = "red";resBox.innerHTML = Σκορ: ${finalScore}<br>🔴 ΚΟΚΚΙΝΟ ΦΩΣ (Offline)<br><span style="font-size:13px; font-weight:normal;">Ανθυγιεινό προϊόν βάσει κειμένου. Απορρίπτεται χωρίς επιθυμία 9 ή 10.</span>;} 
+                    else if (finalScore >= 6.0) {resBox.className = finalScore >= 7.5 ? "green" : "yellow";resBox.innerHTML = Σκορ: ${finalScore}<br>${finalScore >= 7.5 ? '🟢 ΠΡΑΣΙΝΟ ΦΩΣ (Offline)!' : '🟡 ΚΙΤΡΙΝΟ ΦΩΣ (Offline)!'}<br><span style="font-size:13px; font-weight:normal;">Υπολογισμός βάσει ονόματος λόγω δικτύου.</span>;}
+                    else {resBox.className = "red";resBox.innerHTML = Σκορ: ${finalScore}<br>🔴 ΚΟΚΚΙΝΟ ΦΩΣ (Offline)<br><span style="font-size:13px; font-weight:normal;">Απορρίπτεται.</span>;}}}

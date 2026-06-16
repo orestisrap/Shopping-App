@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart AI Shopping Filter v4</title>
+    <title>Smart AI Shopping Filter v6</title>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background-color: #0f172a; color: #f8fafc; padding: 20px; max-width: 480px; margin: 0 auto; }
         h2 { text-align: center; color: #38bdf8; margin-bottom: 5px; }
@@ -11,43 +11,42 @@
         .card { background: #1e293b; padding: 20px; border-radius: 16px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3); border: 1px solid #334155; }
         label { font-weight: bold; display: block; margin-top: 15px; margin-bottom: 5px; color: #cbd5e1; }
         input[type="text"], input[type="number"], select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #475569; font-size: 16px; background-color: #0f172a; color: white; box-sizing: border-box; }
-        input[type="file"] { margin-top: 5px; color: #94a3b8; }
         .checkbox-container { margin-top: 15px; display: flex; align-items: center; background: #1e3a8a; padding: 12px; border-radius: 8px; border: 1px solid #1d4ed8; }
         .checkbox-container input { margin-right: 10px; transform: scale(1.3); }
-        button { width: 100%; background-color: #38bdf8; color: #0f172a; border: none; padding: 14px; font-size: 18px; font-weight: bold; border-radius: 8px; margin-top: 25px; cursor: pointer; transition: 0.2s; }
+        button { width: 100%; background-color: #38bdf8; color: #0f172a; border: none; padding: 14px; font-size: 18px; font-weight: bold; border-radius: 8px; margin-top: 25px; cursor: pointer; }
         button:hover { background-color: #0ea5e9; }
-        #resultBox { display: none; text-align: center; margin-top: 20px; padding: 20px; border-radius: 12px; font-size: 22px; font-weight: bold; }
+        #resultBox { display: none; text-align: center; margin-top: 20px; padding: 20px; border-radius: 12px; font-size: 18px; font-weight: bold; }
         .green { background-color: #10b981; color: white; }
         .yellow { background-color: #f59e0b; color: #0f172a; }
         .red { background-color: #ef4444; color: white; }
-        .loading { text-align: center; color: #94a3b8; font-style: italic; display: none; margin-top: 15px; }
+        .loading { text-align: center; color: #38bdf8; font-style: italic; display: none; margin-top: 15px; font-weight: bold; }
+        .macro-info { font-size: 13px; font-weight: normal; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; margin-top: 10px; text-align: left; line-height: 1.4; }
     </style>
 </head>
 <body>
 
-    <h2>🤖 AI Shopping Filter</h2>
-    <div class="sub">Έκδοση με Φίλτρο Αυστηρότητας για Γλυκά/Junk</div>
+    <h2>🛒 Live Calorie-Protein Filter</h2>
+    <div class="sub">Έκδοση v6 (Κανόνας 10:1 Θερμίδες/Πρωτεΐνη)</div>
     
     <div class="card">
-        <label for="productName">🛒 Όνομα Προϊόντος ή Σκανάρισμα:</label>
-        <input type="text" id="productName" placeholder="π.χ. Σοκολάτα 300γρ">
-        <input type="file" id="productImage" accept="image/*">
+        <label for="productName">🔍 Αναζήτηση Προϊόντος (Internet Search):</label>
+        <input type="text" id="productName" placeholder="e.g. Γιαούρτι στραγγιστό, Lacta, Τόνος">
 
         <label for="price">💰 Τιμή Προϊόντος (€):</label>
-        <input type="number" id="price" step="0.01" placeholder="π.χ. 2.50">
+        <input type="number" id="price" step="0.01" placeholder="e.g. 1.80">
 
         <label for="desire">❤️ Πόσο το θέλεις τώρα; (1-10):</label>
         <select id="desire">
-            <option value="10">10 - Απόλυτη Επιβίωση / Τεράστια Επιθυμία</option>
-            <option value="9">9 - Πολύ μεγάλη Επιθυμία / Κρίσιμη Ανάγκη</option>
-            <option value="8">8 - Βασική Ανάγκη / Έντονη Επιθυμία</option>
-            <option value="7">7 - Αναβάθμιση Ζωής / Αρκετή Επιθυμία</option>
-            <option value="6">6 - Σταθερή Επιθυμία (Το θες μέρες)</option>
+            <option value="10">10 - Απόλυτη Επιβίωση (Νερό, φάρμακα)</option>
+            <option value="9">9 - Κρίσιμη Ανάγκη / Πολύ μεγάλη επιθυμία</option>
+            <option value="8">8 - Βασική Ανάγκη</option>
+            <option value="7">7 - Αναβάθμιση Ζωής</option>
+            <option value="6">6 - Σταθερή Επιθυμία (Το θες καιρό)</option>
             <option value="5">5 - Μέτρια Επιθυμία (Σου αρέσει απλά)</option>
             <option value="4">4 - Παρορμητική τάση (Το είδες τώρα)</option>
-            <option value="3">3 - Περαστικό καπρίτσιο (Shopping therapy)</option>
-            <option value="2">2 - Κοινωνική πίεση (Trends)</option>
-            <option value="1">1 - Άνετα ζεις χωρίς αυτό (Περιττό)</option>
+            <option value="3">3 - Περαστικό καπρίτσιο</option>
+            <option value="2">2 - Κοινωνική πίεση</option>
+            <option value="1">1 - Άνετα ζεις χωρίς αυτό</option>
         </select>
 
         <div class="checkbox-container">
@@ -55,53 +54,71 @@
             <label for="socialBonus" style="margin: 0; font-weight: normal; font-size: 15px; color: #bfdbfe;">👥 Είμαι με παρέα / φίλους (+1 Bonus)</label>
         </div>
 
-        <button onclick="runAIAnalysis()">ΑΝΑΛΥΣΗ & ΥΠΟΛΟΓΙΣΜΟΣ</button>
+        <button onclick="searchAndCalculate()">ΑΝΑΖΗΤΗΣΗ ΣΤΟ INTERNET & ΣΚΟΡ</button>
     </div>
 
-    <div id="loadingText" class="loading">🔄 Το AI αναλύει τα συστατικά και την τιμή...</div>
+    <div id="loadingText" class="loading">🌐 Γίνεται live αναζήτηση στο Open Food Facts...</div>
     <div id="resultBox"></div>
 
     <script>
         function calculateCostScore(price) {
-            if (price <= 2) return 10;
-            if (price <= 5) return 9;
-            if (price <= 15) return 8;
-            if (price <= 50) return 7;
-            if (price <= 100) return 6;
-            if (price <= 300) return 5;
-            if (price <= 800) return 4;
-            if (price <= 2000) return 3;
-            if (price <= 10000) return 2;
-            return 1;
+            if (price <= 3) return 10;
+            if (price <= 10) return 9;
+            if (price <= 30) return 8;
+            if (price <= 70) return 7;
+            if (price <= 150) return 6;
+            return 4;
         }
 
-        async function runAIAnalysis() {
+        async function searchAndCalculate() {
             const product = document.getElementById('productName').value;
             const price = parseFloat(document.getElementById('price').value);
             const desire = parseFloat(document.getElementById('desire').value);
             const isSocial = document.getElementById('socialBonus').checked;
             
             if (!product || isNaN(price)) {
-                alert("Παρακαλώ συμπλήρωσε όνομα προϊόντος και τιμή!");
+                alert("Παρακαλώ συμπλήρωσε όνομα και τιμή!");
                 return;
             }
 
             document.getElementById('loadingText').style.display = "block";
             document.getElementById('resultBox').style.display = "none";
 
-            setTimeout(() => {
-                let healthScore = 6; 
-                const lowerProd = product.toLowerCase();
+            try {
+                const response = await fetch(`https://openfoodfacts.org{encodeURIComponent(product)}&search_simple=1&action=process&json=1&page_size=1`);
+                const data = await response.json();
 
-                // Ανίχνευση ανθυγιεινών τροφίμων
-                if (lowerProd.includes("σοκολάτα") || lowerProd.includes("σοκολατα") || lowerProd.includes("γλυκό") || lowerProd.includes("γλυκο") || lowerProd.includes("donut") || lowerProd.includes("πατατάκια")) {
-                    healthScore = 3; // Πολύ χαμηλό σκορ υγείας
-                } else if (lowerProd.includes("γύρος") || lowerProd.includes("σουβλάκι") || lowerProd.includes("burger")) {
-                    healthScore = 2;
-                } else if (lowerProd.includes("μπάρα") || lowerProd.includes("energy")) {
-                    healthScore = 5;
-                } else if (lowerProd.includes("σαλάτα") || lowerProd.includes("κοτόπουλο") || lowerProd.includes("μπρόκολο")) {
-                    healthScore = 10;
+                let healthScore = 5; 
+                let calories = 0, carbs = 0, protein = 0, calToProteinRatio = 0;
+                let foundName = product;
+
+                if (data.products && data.products.length > 0) {
+                    const p = data.products[0];
+                    foundName = p.product_name_el || p.product_name || product;
+                    const nutrients = p.nutriments;
+
+                    calories = nutrients['energy-kcal_100g'] || 0;
+                    carbs = nutrients['carbohydrates_100g'] || 0;
+                    protein = nutrients['proteins_100g'] || 0;
+
+                    if (protein > 0) {
+                        calToProteinRatio = calories / protein; // Λόγος Θερμίδες / Πρωτεΐνη
+                        
+                        // ΑΛΓΟΡΙΘΜΟΣ ΜΑCROS (Στόχος: 10 θερμίδες ανά 1g πρωτεΐνης ή λιγότερο)
+                        if (calToProteinRatio <= 10) healthScore = 10;      // Κορυφαίο (π.χ. 200kcal, 20g πρωτεΐνη)
+                        else if (calToProteinRatio <= 15) healthScore = 8; // Πολύ καλό (π.χ. 300kcal, 20g πρωτεΐνη)
+                        else if (calToProteinRatio <= 25) healthScore = 6; // Μέτριο (π.χ. 500kcal, 20g πρωτεΐνη)
+                        else if (calToProteinRatio <= 40) healthScore = 4; // Χαμηλό σε πρωτεΐνη / Περισσότερα λιπαρά-υδατ.
+                        else healthScore = 2;                             // Junk food / Σχεδόν μηδενική πρωτεΐνη
+                    } else {
+                        // Αν δεν έχει καθόλου πρωτεΐνη
+                        healthScore = calories > 150 ? 2 : 5; 
+                    }
+
+                    // Έξτρα ασφάλεια για «βόμβες» ζάχαρης
+                    if (product.toLowerCase().includes("σοκολάτα") || product.toLowerCase().includes("lacta") || product.toLowerCase().includes("cola")) {
+                        healthScore = 2;
+                    }
                 }
 
                 const costScore = calculateCostScore(price);
@@ -114,30 +131,40 @@
 
                 finalScore = parseFloat(finalScore.toFixed(1));
                 
-                // 🔥 Ο ΝΕΟΣ ΚΑΝΟΝΑΣ ΑΥΣΤΗΡΟΤΗΤΑΣ
-                // Αν είναι ανθυγιεινό (Υγεία < 5) και η επιθυμία είναι 8 ή λιγότερο, το ρίχνει στο Κόκκινο!
-                let forceReject = false;
-                if (healthScore < 5 && desire <= 8) {
-                    forceReject = true;
-                }
-
                 document.getElementById('loadingText').style.display = "none";
                 const resBox = document.getElementById('resultBox');
                 resBox.style.display = "block";
 
-                if (finalScore >= 7.5 && !forceReject) {
-                    resBox.className = "green";
-                    resBox.innerHTML = `Σκορ: ${finalScore}<br>🟢 ΠΡΑΣΙΝΟ ΦΩΣ!<br><span style="font-size:13px; font-weight:normal;">AI Εκτίμηση Υγείας: ${healthScore}/10. Απόλαυσέ το!</span>`;
-                } else if (finalScore >= 6.0 && !forceReject) {
-                    resBox.className = "yellow";
-                    resBox.innerHTML = `Σκορ: ${finalScore}<br>🟡 ΚΙΤΡΙΝΟ ΦΩΣ!<br><span style="font-size:13px; font-weight:normal;">AI Εκτίμηση Υγείας: ${healthScore}/10. Οριακή έγκριση.</span>`;
+                let ratioText = protein > 0 ? `${calToProteinRatio.toFixed(1)} kcal ανά 1g πρωτεΐνης` : 'N/A (Μηδενική πρωτεΐνη)';
+
+                let macroHTML = `
+                    <div class="macro-info">
+                        <strong>Προϊόν:</strong> ${foundName}<br>
+                        <strong>Θερμίδες (100g):</strong> ${calories} kcal<br>
+                        <strong>Υδατάνθρακες (100g):</strong> ${carbs}g<br>
+                        <strong>Πρωτεΐνη (100g):</strong> ${protein}g<br>
+                        <strong>Αναλογία:</strong> ${ratioText}<br>
+                        <strong>Στόχος Αναλογίας:</strong> &le; 10.0 (Ιδανικό)<br>
+                        <strong>Βαθμός Υγείας:</strong> ${healthScore}/10
+                    </div>`;
+
+                // ΕΦΑΡΜΟΓΗ ΚΟΦΤΗ: Αν η υγεία είναι κακιά (<=3) και η επιθυμία < 9 -> ΑΠΟΡΡΙΨΗ
+                if (healthScore <= 3 && desire < 9) {
+                    resBox.className = "red";
+                    resBox.innerHTML = `Σκορ: ${finalScore}<br>🔴 ΚΟΚΚΙΝΟ ΦΩΣ!<br><span style="font-size:14px; font-weight:normal;">Απορρίπτεται λόγω αναλογίας θερμίδων/πρωτεΐνης! Χρειάζεται επιθυμία 9 ή 10 για να εγκριθεί.</span> ${macroHTML}`;
+                } else if (finalScore >= 6.0) { // Νέο ρεαλιστικό όριο
+                    resBox.className = finalScore >= 7.5 ? "green" : "yellow";
+                    resBox.innerHTML = `Σκορ: ${finalScore}<br>${finalScore >= 7.5 ? '🟢 ΠΡΑΣΙΝΟ ΦΩΣ!' : '🟡 ΚΙΤΡΙΝΟ ΦΩΣ!'}<br><span style="font-size:14px; font-weight:normal;">Η αγορά εγκρίνεται βάσει των κριτηρίων σου.</span> ${macroHTML}`;
                 } else {
                     resBox.className = "red";
-                    resBox.innerHTML = `Σκορ: ${finalScore}<br>🔴 ΚΟΚΚΙΝΟ ΦΩΣ!<br><span style="font-size:13px; font-weight:normal;">Απορρίπτεται! Είναι ανθυγιεινό και η επιθυμία σου (${desire}/10) δεν είναι αρκετά υψηλή για να το δικαιολογήσει.</span>`;
+                    resBox.innerHTML = `Σκορ: ${finalScore}<br>🔴 ΚΟΚΚΙΝΟ ΦΩΣ!<br><span style="font-size:14px; font-weight:normal;">Απορρίπτεται.</span> ${macroHTML}`;
                 }
-            }, 1000);
+
+            } catch (error) {
+                document.getElementById('loadingText').style.display = "none";
+                alert("Σφάλμα κατά τη σύνδεση στο ίντερνετ. Δοκίμασε ξανά!");
+            }
         }
     </script>
 </body>
 </html>
-
